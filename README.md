@@ -222,21 +222,4 @@ A heads-up panel at the top of view shows three rows:
 
 ## Privacy Policy
 
-Visual Spectrum does not collect, store, transmit, or share any personal data.
 
-- **Camera**: processed in real time on-device; no frames are saved or transmitted unless you explicitly take a photo or start a video recording using the in-app capture feature.
-- **Microphone**: audio samples are processed in real time on-device for visualization only; no audio is recorded or transmitted.
-- **Network (Mode 42 only)**: the app listens on a local UDP port to receive magnetometer data from GyrOSC on the same network. No data is sent outbound. No internet connection is required or used.
-- **Depth sensor**: depth data is used only for real-time visualization and is not stored.
-
-No account, login, or personal information is required to use this app.
-
----
-
-## Open Source
-
-Source code is available at [github.com/christopherhe1/visual-spectrum](https://github.com/christopherhe1/visual-spectrum).
-
----
-
-*Built with Unity 6 · OpenXR · AR Foundation · Meta XR SDK · targeting Meta Quest 3S*
