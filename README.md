@@ -218,8 +218,13 @@ A heads-up panel at the top of view shows three rows:
 | `com.oculus.permission.EYE_TRACKING` | Gaze-aware features |
 | `com.oculus.permission.HAND_TRACKING` | Future hand-input support |
 
----
+## Developer Information
 
-## Privacy Policy
+**Developer:** Bicentennial Software  
+bicentennialsoftware@gmail.com
+
+[Privacy Policy](privacy-policy.md)
+
+---
 
 
