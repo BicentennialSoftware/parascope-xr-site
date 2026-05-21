@@ -1,6 +1,6 @@
 # Visual Spectrum
 
-**Visual Spectrum** is a mixed reality application for the Meta Quest 3S that transforms your passthrough camera feed into a real-time spectral visualization lab. Using custom GLSL shaders applied directly to the camera image, it renders 43 distinct visual modes — from scientific imaging simulations and motion analysis tools to audio-reactive visualizations and live magnetic field mapping.
+**Visual Spectrum** is a mixed reality application for the Meta Quest 3S that transforms your passthrough camera feed into a real-time spectral visualization lab. Using custom GLSL shaders applied directly to the camera image, it renders 50 distinct visual modes — from scientific imaging simulations and motion analysis tools to audio-reactive visualizations, live magnetic field mapping, real-time barometric pressure monitoring, live 3D spatial point-cloud scanning via ARKit, and live LiDAR depth visualization streamed wirelessly from an iPhone.
 
 Every mode runs entirely on-device with no cloud dependency. The passthrough view remains active at all times, keeping you grounded in your real environment while the app layers visual information on top of it.
 
@@ -9,8 +9,9 @@ Every mode runs entirely on-device with no cloud dependency. The passthrough vie
 ## Hardware Requirements
 
 - **Meta Quest 3S** (primary target; also compatible with Meta Quest 3)
-- **iPhone with GyrOSC app** — required for Magnetic Vision mode only (Mode 42)
-- Both devices on the same Wi-Fi network for Magnetic Vision
+- **iPhone with GyrOSC app** — required for Magnetic Vision (Mode 42) and Barometric Pressure (Mode 43)
+- **iPhone 12 or later with Record3D app** — required for LiDAR modes (45–49); WiFi streaming requires in-app purchase
+- Both devices on the same Wi-Fi network for all iPhone-dependent modes
 
 ---
 
@@ -22,8 +23,9 @@ Every mode runs entirely on-device with no cloud dependency. The passthrough vie
 | **B / Y Button** | Previous mode |
 | **Thumbstick Up/Down** | Zoom in / out (most modes) |
 | **Thumbstick Up/Down** | Adjust sensitivity (Magnetic Vision mode) |
+| **Thumbstick Up/Down** | Adjust view scale (LiDAR modes 45–49) |
 | **Trigger** | Toggle freeze (Strobe / Frame Freeze mode) |
-| **Trigger** | Calibrate baseline (Magnetic Vision mode) |
+| **Trigger** | Calibrate baseline (Magnetic Vision / Barometric Pressure modes) |
 
 The mode name is displayed at the bottom of the view for 3 seconds after each change.
 
@@ -31,7 +33,7 @@ The mode name is displayed at the bottom of the view for 3 seconds after each ch
 
 ## Modes
 
-Modes are organized into eight categories. Use A/X and B/Y to cycle through all 43.
+Modes are organized into eight categories. Use A/X and B/Y to cycle through all 50.
 
 ---
 
@@ -171,6 +173,7 @@ These modes use the device microphone. A RECORD_AUDIO permission prompt will app
 | # | Name | Description |
 |---|---|---|
 | 42 | **Magnetic Vision** | Real-time magnetic dipole field line visualization driven by live magnetometer data from an iPhone. |
+| 43 | **Barometric Pressure** | Live barometric pressure monitoring with a 2-minute seismograph-style history graph. Edge vignette shifts blue/violet on pressure drops and amber/red on rises. Alerts pulse when deviation exceeds 0.5 hPa from baseline. |
 
 #### How It Works
 
@@ -205,6 +208,111 @@ A heads-up panel at the top of view shows three rows:
 
 ---
 
+### Barometric Pressure Visualization (Mode 43)
+
+| # | Name | Description |
+|---|---|---|
+| 43 | **Barometric Pressure** | Live pressure monitoring with scrolling history graph and anomaly alerts. |
+
+#### How It Works
+
+Uses the same GyrOSC connection as Mode 42. GyrOSC sends barometric pressure readings from the iPhone's built-in sensor over UDP/OSC to the Quest. The app records one sample per second and maintains a 2-minute rolling history.
+
+#### Visualization
+
+- **Edge vignette** tints the scene border based on pressure trend: blue/violet for dropping pressure, amber/red for rising pressure
+- **Seismograph graph** at the bottom of the view plots the last 2 minutes of readings as a glowing colored line — green at baseline, blue for drops, amber/red for rises
+- **Baseline reference** — a faint center line marks the calibrated zero point
+- **Alert pulse** — edges flash when pressure deviates more than 0.5 hPa from baseline
+
+#### Setup
+
+1. Same GyrOSC connection as Mode 42 — enable the **Barometer** channel in GyrOSC in addition to (or instead of) Magnetometer
+2. Switch to Mode 43 — the first reading auto-sets the baseline
+3. Optional: pull trigger to manually recalibrate the baseline to the current reading
+4. Watch the graph — sudden drops are associated with cold spots and pressure anomalies
+
+#### HUD Display (Mode 43)
+
+- Connection status
+- Current pressure in hPa
+- Delta from baseline (±hPa) — shows `!` when alert threshold is exceeded
+
+---
+
+### ARKit Spatial Scanner (Mode 44)
+
+| # | Name | Description |
+|---|---|---|
+| 44 | **ARKit Spatial Scanner** | Live 3D point cloud of your environment, captured by ARKit on an iPhone and streamed wirelessly to the Quest in real time. |
+
+#### How It Works
+
+An iPhone running **ZIG SIM Pro** (App Store) streams ARKit feature points over UDP/JSON to the Quest on port 9000. ARKit continuously tracks hundreds of 3D world-space anchor points as the phone camera scans the environment. The Quest receives up to 128 of these points per frame, converts them from ARKit's right-handed coordinate system to Unity's left-handed system, and renders them as a glowing particle cloud floating 1.5 m ahead of you.
+
+#### Visualization
+
+- **Point cloud** rendered as particles with depth-based color grading: near points glow warm white/yellow, far points shift to cool cyan
+- **Cyan scanline sweep** pulses horizontally across the passthrough image to suggest active spatial scanning
+- **Subtle vignette** frames the corners in dark cyan to focus attention on the scan volume
+- The passthrough image is dimmed slightly so the point cloud stands out against the real environment
+
+#### Setup
+
+1. Install **ZIG SIM Pro** on iPhone (App Store)
+2. Put both devices on the same Wi-Fi network
+3. In ZIG SIM Pro: set target IP to the Quest's IP address, port **9000**, enable **ARKit** mode (feature points)
+4. Set message rate to 10–30 Hz for smooth updates
+5. Switch to Mode 44 — the HUD shows "Waiting..." until the first packet arrives, then "Connected" with a live point count
+
+#### HUD Display (Mode 44)
+
+- Connection status (`Waiting...` / `Connected`)
+- Live feature point count
+
+---
+
+### LiDAR Visualization Suite (Modes 45–49)
+
+An iPhone running **Record3D** streams a live RGBD video frame over WebRTC to the Quest on the local WiFi network. Each frame is a side-by-side texture — HSV-encoded depth on the left half, RGB color on the right. The Quest auto-discovers the iPhone by scanning the local network and connects automatically within ~8 seconds of switching to any LiDAR mode.
+
+Requires **iPhone 12 or later** (LiDAR scanner required). iPhone 14 Pro or later delivers the best depth resolution.
+
+**Scale control:** In any LiDAR mode, **thumbstick up/down** adjusts the view scale (0.15× to 1.0×) so you can size the image to match your physical environment without rebuilding.
+
+| # | Name | Description |
+|---|---|---|
+| 45 | **LiDAR Depth Scan** | Per-pixel depth heatmap on a black background. Near surfaces glow hot white, mid-range turns green, distant surfaces shift to cyan. Passthrough is completely replaced inside the LiDAR frame. |
+| 46 | **LiDAR RGB+Depth** | iPhone's live color image tinted by depth — real surface colors blended with the depth ramp. Passthrough shows outside the LiDAR frame. |
+| 47 | **LiDAR Contour Bands** | Depth rendered as topographic contour bands with bright lines at equidistant depth intervals, like an elevation map. |
+| 48 | **LiDAR Edge Outlines** | Bright outlines appear at depth discontinuities — object silhouettes and surface boundaries glow where near and far regions meet. |
+| 49 | **LiDAR Bands+Edges** | Contour bands and edge outlines combined for maximum spatial detail. |
+
+#### Color Scale
+
+| Distance | Color |
+|---|---|
+| < 0.3 m | Hot white flash |
+| 0.3 – 1.0 m | Warm amber / orange |
+| 1.0 – 2.0 m | Bright green |
+| 2.0 – 2.8 m | Cyan / blue |
+| > 2.8 m or no reading | Black (Mode 45) or passthrough (Modes 46–49) |
+
+#### Setup
+
+1. Install **Record3D** on iPhone (App Store, free; WiFi streaming requires in-app purchase)
+2. Put both devices on the same WiFi network
+3. Open Record3D and start WiFi streaming
+4. Switch to any LiDAR mode (45–49) — the app auto-discovers the iPhone and connects within ~8 seconds
+5. Use **thumbstick up/down** to adjust the scale until objects appear at a natural size
+
+#### HUD Display
+
+- Connection status (`Waiting...` / `Connected | 192.168.x.x`)
+- Auto-reconnects if the signal drops
+
+---
+
 ## Permissions
 
 | Permission | Required For |
@@ -212,11 +320,27 @@ A heads-up panel at the top of view shows three rows:
 | `CAMERA` | All modes — passthrough camera feed |
 | `RECORD_AUDIO` | Modes 40–41 (audio visualization) |
 | `MODIFY_AUDIO_SETTINGS` | Modes 40–41 (ambient audio capture) |
-| `INTERNET` | Mode 42 (OSC/UDP reception) |
-| `ACCESS_NETWORK_STATE` | Mode 42 |
+| `INTERNET` | Modes 42–49 (OSC/UDP/WebRTC reception) |
+| `ACCESS_NETWORK_STATE` | Modes 42–49 |
 | `com.oculus.permission.USE_SCENE` | Modes 35–36 (depth sensor) |
 | `com.oculus.permission.EYE_TRACKING` | Gaze-aware features |
 | `com.oculus.permission.HAND_TRACKING` | Future hand-input support |
+
+---
+
+## Privacy Policy
+
+Visual Spectrum does not collect, store, transmit, or share any personal data.
+
+- **Camera**: processed in real time on-device; no frames are saved or transmitted unless you explicitly take a photo or start a video recording using the in-app capture feature.
+- **Microphone**: audio samples are processed in real time on-device for visualization only; no audio is recorded or transmitted.
+- **Network (Modes 42–49)**: the app receives sensor data from GyrOSC (port 7000, UDP), ZIG SIM Pro (port 9000, UDP), and Record3D (WebRTC over local WiFi) on the same network. No data is sent beyond the local network. No internet connection is required.
+- **Depth sensor**: depth data is used only for real-time visualization and is not stored.
+
+No account, login, or personal information is required to use this app.
+
+---
+
 
 ## Developer Information
 
