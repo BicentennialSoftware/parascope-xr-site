@@ -9,8 +9,10 @@ Every mode runs entirely on-device with no cloud dependency. The passthrough vie
 ## Hardware Requirements
 
 - **Meta Quest 3S** (primary target; also compatible with Meta Quest 3)
-- **iPhone with GyrOSC app** — required for Magnetic Vision (Mode 42) and Barometric Pressure (Mode 43)
-- **iPhone 12 or later with Record3D app** — required for LiDAR modes (45–49); WiFi streaming requires in-app purchase
+- **iPhone with GyrOSC app** ($0.99, App Store) — required for Magnetic Vision (Mode 42)
+- **iPhone with ZIG SIM app** (free, App Store) — required for Barometric Pressure (Mode 43)
+- **iPhone with ZIG SIM Pro app** (App Store) — required for ARKit Spatial Scanner (Mode 44)
+- **iPhone 12 or later with Record3D app** (free + in-app purchase, App Store) — required for LiDAR modes (45–49)
 - Both devices on the same Wi-Fi network for all iPhone-dependent modes
 
 ---
@@ -216,7 +218,7 @@ A heads-up panel at the top of view shows three rows:
 
 #### How It Works
 
-Uses the same GyrOSC connection as Mode 42. GyrOSC sends barometric pressure readings from the iPhone's built-in sensor over UDP/OSC to the Quest. The app records one sample per second and maintains a 2-minute rolling history.
+An iPhone running **ZIG SIM** (free, App Store) sends barometric pressure readings from the iPhone's built-in sensor over UDP/JSON to the Quest on port 9000. The app records one sample per second and maintains a 2-minute rolling history.
 
 #### Visualization
 
@@ -227,10 +229,12 @@ Uses the same GyrOSC connection as Mode 42. GyrOSC sends barometric pressure rea
 
 #### Setup
 
-1. Same GyrOSC connection as Mode 42 — enable the **Barometer** channel in GyrOSC in addition to (or instead of) Magnetometer
-2. Switch to Mode 43 — the first reading auto-sets the baseline
-3. Optional: pull trigger to manually recalibrate the baseline to the current reading
-4. Watch the graph — sudden drops are associated with cold spots and pressure anomalies
+1. Install **ZIG SIM** (free) on iPhone (App Store)
+2. Put both devices on the same Wi-Fi network
+3. In ZIG SIM: set target IP to the Quest's IP address, port **9000**, enable **Barometer**
+4. Switch to Mode 43 — the first reading auto-sets the baseline
+5. Optional: pull trigger to manually recalibrate the baseline to the current reading
+6. Watch the graph — sudden drops are associated with cold spots and pressure anomalies
 
 #### HUD Display (Mode 43)
 
@@ -340,6 +344,7 @@ Visual Spectrum does not collect, store, transmit, or share any personal data.
 No account, login, or personal information is required to use this app.
 
 ---
+
 
 
 ## Developer Information
