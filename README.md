@@ -1,6 +1,6 @@
-# Visual Spectrum
+# Parascope XR
 
-**Visual Spectrum** is a mixed reality application for the Meta Quest 3S that transforms your passthrough camera feed into a real-time spectral visualization lab. Using custom GLSL shaders applied directly to the camera image, it renders 50 distinct visual modes — from scientific imaging simulations and motion analysis tools to audio-reactive visualizations, live magnetic field mapping, real-time barometric pressure monitoring, live 3D spatial point-cloud scanning via ARKit, and live LiDAR depth visualization streamed wirelessly from an iPhone.
+**Parascope XR** is a mixed reality application for the Meta Quest 3S that transforms your passthrough camera feed into a real-time spectral visualization lab. Using custom GLSL shaders applied directly to the camera image, it renders 50 distinct visual modes — from scientific imaging simulations and motion analysis tools to audio-reactive visualizations, live magnetic field mapping, real-time barometric pressure monitoring, live 3D spatial point-cloud scanning via ARKit, and live LiDAR depth visualization streamed wirelessly from an iPhone.
 
 Every mode runs entirely on-device with no cloud dependency. The passthrough view remains active at all times, keeping you grounded in your real environment while the app layers visual information on top of it.
 
@@ -334,7 +334,7 @@ Requires **iPhone 12 or later** (LiDAR scanner required). iPhone 14 Pro or later
 
 ## Privacy Policy
 
-Visual Spectrum does not collect, store, transmit, or share any personal data.
+Parascope XR does not collect, store, transmit, or share any personal data.
 
 - **Camera**: processed in real time on-device; no frames are saved or transmitted unless you explicitly take a photo or start a video recording using the in-app capture feature.
 - **Microphone**: audio samples are processed in real time on-device for visualization only; no audio is recorded or transmitted.
